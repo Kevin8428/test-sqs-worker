@@ -26,7 +26,7 @@ func (p *Pool) Start(worker Worker) {
 	// No buffer. That means pool.Stop() will block until it stops.
 	p.shutdownChannel = make(chan bool)
 	p.terminateChannel = make(chan bool)
-
+	fmt.Println("starting worker pool")
 	for {
 		select {
 		case w := <-workerChannel:
@@ -42,9 +42,10 @@ func (p *Pool) Start(worker Worker) {
 				p.workerFinished()
 			}()
 		case <-p.shutdownChannel:
+			fmt.Println("shutting down channel")
 			p.shuttingDown = true
 		case <-p.terminateChannel:
-			fmt.Println("Got shutdown message in worker pool")
+			fmt.Println("terminating channel")
 			return
 		default:
 			time.Sleep(time.Duration(p.WaitTime) * time.Millisecond)
