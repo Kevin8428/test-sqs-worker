@@ -1,6 +1,7 @@
 package sqsworker
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -38,5 +39,6 @@ func NewConsumer(handler worker.Handler) *SQSConsumer {
 }
 
 func (s *SQSConsumer) Start() {
+	fmt.Println("002")
 	go s.workerPool.Start(s.worker)
 }
