@@ -7,13 +7,10 @@ import (
 )
 
 type Worker struct {
-	Handler Handler
-	// Metrics                 metrics.Client
-	// BackoffStrategy         backoffStrategy
+	Handler                 Handler
 	Queue                   client.Client
 	BackoffExponent         int
 	IgnoreDuplicateMessages bool
-	// RedisClient             *redis.Clientj
 }
 
 func (w *Worker) Work() {
@@ -27,6 +24,17 @@ func (w *Worker) Work() {
 		fmt.Println("no message received")
 		return
 	}
+
 	// to be run by service importing
-	// err = w.Handler.Handle(message.Payload, message.Attributes)
+	err = w.Handler.Handle(message.Payload, message.MessageAttributes)
+	if err != nil {
+		fmt.Println("error handling message: ", err)
+		return
+	}
+	err = w.Queue.DeleteMessage(message)
+	if err != nil {
+		fmt.Println("error deleting message: ", err)
+		return
+	}
+
 }

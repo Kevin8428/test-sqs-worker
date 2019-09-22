@@ -12,27 +12,8 @@ import (
 )
 
 type SQSConsumer struct {
-	workers *workerpool.Pool
-	worker  *worker.Worker
-}
-
-// SQS driver that satisfies the queue.Client interface
-type SQSClientTwo struct {
-	*sqs.SQS
-	QueueURL string
-}
-
-type ConsumerConfig struct {
-	// Handler                          worker.Handler
-	// AWSRegion                        string
-	// QueueURL                         string
-	// RateLimit                        int
-	// Parallel                         int
-	// Pool                             int
-	// SQSWorkerIgnoreDuplicateMessages bool
-	// SQSWorkerRedisConnectionString   string
-	// BackoffExponent                  int
-	// BackoffStrategy                  string
+	workerPool *workerpool.Pool
+	worker     *worker.Worker
 }
 
 func NewConsumer(handler worker.Handler) *SQSConsumer {
@@ -51,11 +32,11 @@ func NewConsumer(handler worker.Handler) *SQSConsumer {
 		Handler: handler,
 	}
 	return &SQSConsumer{
-		worker:  worker,
-		workers: pool,
+		worker:     worker,
+		workerPool: pool,
 	}
 }
 
 func (s *SQSConsumer) Start() {
-	go s.workers.Start(s.worker)
+	go s.workerPool.Start(s.worker)
 }
